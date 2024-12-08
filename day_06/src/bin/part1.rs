@@ -1,3 +1,5 @@
+use std::{collections::HashMap, vec};
+
 
 
 fn main() {
@@ -41,80 +43,44 @@ fn process(input: &str) -> String {
         }
     }
 
-    let mut is_out_of_bounds = false;
+    // Parse obstacles
 
-    while !is_out_of_bounds {
-        matrix[player_row][player_col] = 'X';
-        if player_facing == 'N' {
-            if player_row > 0 {
-                let possible_row = player_row - 1;
-                let possible_col = player_col;
-                if matrix[possible_row][possible_col] == '#' {
-                    player_facing = 'E';
-                    continue;
+    // These are maps where the key is either the row/ column, and for every of those you have the sorted obstacles 
+    // w.r.t the other dimension  
+    let mut obstacles_row: HashMap<usize, Vec<usize>> = HashMap::new();
+    let mut obstacles_col: HashMap<usize, Vec<usize>> = HashMap::new();
+
+    for (i , row) in matrix.iter().enumerate() {
+        for (j,c) in row.iter().enumerate() {
+            if *c == '#' {
+                if obstacles_row.contains_key(&i) {
+                    obstacles_row.get_mut(&i).unwrap().push(j);
                 } else {
-                    player_row = possible_row;
-                    player_col = possible_col;
-                    continue;
-                } 
-            } else {
-                is_out_of_bounds = true;
-                continue;
-            }
-        }
-        if player_facing == 'S' {
-            if player_row < matrix.len() {
-                let possible_row = player_row + 1;
-                let possible_col = player_col;
-                if matrix[possible_row][possible_col] == '#' {
-                    player_facing = 'W';
-                    continue;
+                    let mut v: Vec<usize> = vec![j];
+                    obstacles_row.insert(i, v);
+                }
+
+                if obstacles_col.contains_key(&j) {
+                    obstacles_col.get_mut(&j).unwrap().push(i);
                 } else {
-                    player_row = possible_row;
-                    player_col = possible_col;
-                    continue;
-                } 
-            } else {
-                is_out_of_bounds = true;
-                continue;
-            }
-        }
-        if player_facing == 'E' {
-            if player_col < matrix[0].len() {
-                let possible_row = player_row;
-                let possible_col = player_col + 1;
-                if matrix[possible_row][possible_col] == '#' {
-                    player_facing = 'S';
-                    continue;
-                } else {
-                    player_row = possible_row;
-                    player_col = possible_col;
-                    continue;
-                } 
-            } else {
-                is_out_of_bounds = true;
-                continue;
-            }
-        }
-        if player_facing == 'W' {
-            if player_col > 0 {
-                let possible_row = player_row;
-                let possible_col = player_col - 1;
-                if matrix[possible_row][possible_col] == '#' {
-                    player_facing = 'N';
-                    continue;
-                } else {
-                    player_row = possible_row;
-                    player_col = possible_col;
-                    continue;
-                } 
-            } else {
-                is_out_of_bounds = true;
-                continue;
+                    let mut v: Vec<usize> = vec![i];
+                    obstacles_col.insert(j, v);
+                }
+
             }
         }
     }
     
+    for  (_, value) in &mut obstacles_row {
+        value.sort();
+    }
+
+    for  (_, value) in &mut obstacles_col {
+        value.sort();
+    }
+
+    let mut is_out_of_bounds = false;
+
 
     
     return "41".to_string();
